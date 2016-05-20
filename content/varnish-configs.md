@@ -12,8 +12,8 @@ The configurations are [Varnish configuration files].
 They are written in [Varnish Configuration Language] (VCL), a
 small domain-specific language (DSL) designed used to define
 request handling and document caching policies for the Varnish
-HTTP accelerator. A Varnish configuration file used to 
-customize the configuration for a [Service]. A Service
+HTTP accelerator. A Varnish configuration file customizes the
+handling of requests made to a specific [Service]. A Service
 represents the configuration for a website, app, api, or
 anything else to be served through Fastly.
 
