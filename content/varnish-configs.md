@@ -113,7 +113,7 @@ More specificially:
 Now that we have defined an ACL, Directors, and a caching strategy, we can
 synthesize a coherent request handling process. This is defined in `vcl_recv`.
 
-  1. Receive all requests to `regsitry.npmjs.org`
+  1. Receive all requests to `registry.npmjs.org`
   2. Reject all IPs listed in the the ACL
   3. Determine if the request is for a tarball (package data) or something else
 
