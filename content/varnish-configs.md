@@ -142,20 +142,14 @@ If a tarball request is received:
     ```
 
 2. After updating the URL, send the request to the appropriate `frontdoor` server
-   location:
+   location. To do this, npm:
 
-  - If `EU`, send to the `tarballs_eu` Director
-  - If `US-East` or `US-Central`, send to the `tarballs_east` Director
-  - If the request is from a datacenter in regions `syd`, `per`, `mel`, `bne`,
-     `akl`, `wlg`, `sin`, send to `tarballs_syd` Director
-  - Send all other requests to `tarballs_west` Director
-
-3. If the tarball server fails to redirect to `frontdoor`, send it directly, based
-  on the location of the request:
-
-  - If `EU`, send to the `packages_eu` Director
-  - If `US-East` or `US-Central`, send to the `packages_east` Director
-  - Send all other requests to `packages_west` Director
+      1. Looks at the global region of the [Fastly Point of Presence (POP)] handling the request. 
+      2. Attempts to match it to the closest datacenter in npm's infrastructure, by passing
+        the request to one of several tarball Directors which will distribute the incoming requets
+        among several local Backends.
+      3. If this request fails, perhaps because a specific server has gone offline,
+        send the request to `west`, where we there is the most redundancy.
 
 ### Non-Tarball Requests
 
@@ -169,6 +163,20 @@ If a non-tarball request is received we first determine whether the request is o
 one of the above two types, and then proceed accordingly.
 
 #### New, Update, or Delete Actions on Packages
+
+Similar to Tarball Requests, as explained above, npm will send the request to
+the appropriate server by:
+
+  A. Look at the global region of the [Fastly Point of Presence (POP)] handling the request.
+  B. Attempt to match it to the closest datacenter in npm's infrastructure, by passing
+     the request to one of two Directors (`east` and `west`) which will distribute the
+     incoming requests  among several local Backends.
+
+     NOTE: These requests need to be directed to a packages Backend that has a local
+     [validate-and-store (V&S)], so only `east` and `west` locations are supported right now.
+
+  C. If this request fails, perhaps because a specific server has gone offline,
+     send the request to `west`, where we there is the most redundancy.
 
 - Send `US-East`, `US-Central`, and `EU` to the `packages_east` Director
 - Send all other request locations to the `packages_west` Director 
@@ -190,3 +198,5 @@ one of the above two types, and then proceed accordingly.
 [Varnish configuration files]: https://docs.fastly.com/api/config#vcl
 [Service]: https://docs.fastly.com/api/config#service
 [Fastly Network Map]: https://www.fastly.com/network-map
+[Fastly Point of Presence (POP)]: https://docs.fastly.com/guides/about-fastly-services/fastly-pop-locations
+[validate-and-store (V&S)]: https://github.com/npm/validate-and-store
